@@ -63,7 +63,7 @@ export default async function StatsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="card">
             <div className="flex items-center">
-              <BarChart3 className="h-8 w-8 text-primary-600" />
+                             <BarChart3 className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Tổng từ vựng</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalWords}</p>
@@ -120,7 +120,7 @@ export default async function StatsPage() {
                   <div className="flex items-center">
                     <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
                       <div 
-                        className="bg-primary-600 h-2 rounded-full"
+                                                 className="bg-blue-600 h-2 rounded-full"
                         style={{ 
                           width: `${(level._count.level / stats.totalWords) * 100}%` 
                         }}

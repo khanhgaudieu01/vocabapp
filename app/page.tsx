@@ -82,7 +82,7 @@ export default async function HomePage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           <div className="card">
             <div className="flex items-center">
-              <BookOpen className="h-8 w-8 text-primary-600" />
+              <BookOpen className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Tổng từ vựng</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalWords}</p>
