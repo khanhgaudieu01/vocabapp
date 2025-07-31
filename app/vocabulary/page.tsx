@@ -41,6 +41,28 @@ export default function VocabularyPage() {
     }
   }
 
+  const handleDelete = async (id: number, chinese: string) => {
+    if (!confirm(`Bạn có chắc muốn xóa từ "${chinese}"?`)) {
+      return
+    }
+
+    try {
+      const response = await fetch(`/api/vocabulary/${id}`, {
+        method: 'DELETE'
+      })
+
+      if (response.ok) {
+        // Remove from local state
+        setVocabulary(prev => prev.filter(word => word.id !== id))
+      } else {
+        alert('Có lỗi xảy ra khi xóa từ vựng')
+      }
+    } catch (error) {
+      console.error('Error deleting vocabulary:', error)
+      alert('Có lỗi xảy ra khi xóa từ vựng')
+    }
+  }
+
   return (
     <div>
       <Header />
@@ -82,7 +104,10 @@ export default function VocabularyPage() {
                     <button className="text-gray-400 hover:text-blue-600">
                       <Edit className="h-4 w-4" />
                     </button>
-                    <button className="text-gray-400 hover:text-red-600">
+                    <button 
+                      onClick={() => handleDelete(word.id, word.chinese)}
+                      className="text-gray-400 hover:text-red-600"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>

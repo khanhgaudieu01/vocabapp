@@ -35,6 +35,18 @@ export default function HomePage() {
   useEffect(() => {
     fetchStats()
     fetchTodayReviews()
+
+    // Listen for vocabulary added event
+    const handleVocabularyAdded = () => {
+      fetchStats()
+      fetchTodayReviews()
+    }
+
+    window.addEventListener('vocabularyAdded', handleVocabularyAdded)
+
+    return () => {
+      window.removeEventListener('vocabularyAdded', handleVocabularyAdded)
+    }
   }, [])
 
   const fetchStats = async () => {

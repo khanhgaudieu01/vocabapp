@@ -1,23 +1,62 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
-import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
 import { getLevelName } from '@/lib/utils'
 import { BarChart3, TrendingUp, Clock, CheckCircle } from 'lucide-react'
 
-async function getStats() {
-  // Temporary mock data for build success
-  return {
+interface StatsData {
+  totalWords: number
+  totalReviews: number
+  correctReviews: number
+  successRate: number
+  levelDistribution: any[]
+  recentReviews: any[]
+}
+
+export default function StatsPage() {
+  const [stats, setStats] = useState<StatsData>({
     totalWords: 0,
     totalReviews: 0,
     correctReviews: 0,
     successRate: 0,
-    levelDistribution: [] as any[],
-    recentReviews: [] as any[]
-  }
-}
+    levelDistribution: [],
+    recentReviews: []
+  })
+  const [isLoading, setIsLoading] = useState(true)
 
-export default async function StatsPage() {
-  const stats = await getStats()
+  useEffect(() => {
+    fetchStats()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/detailed-stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Error fetching detailed stats:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div>
+        <Header />
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Đang tải thống kê...</p>
+          </div>
+        </main>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -37,7 +76,7 @@ export default async function StatsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="card">
             <div className="flex items-center">
-                             <BarChart3 className="h-8 w-8 text-blue-600" />
+              <BarChart3 className="h-8 w-8 text-blue-600" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Tổng từ vựng</p>
                 <p className="text-2xl font-bold text-gray-900">{stats.totalWords}</p>
@@ -85,29 +124,29 @@ export default async function StatsPage() {
                 <p className="text-gray-500 text-center">Chưa có dữ liệu</p>
               ) : (
                 stats.levelDistribution.map((level) => (
-                <div key={level.level} className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <span className="text-sm font-medium text-gray-700">
-                      Level {level.level}
-                    </span>
-                    <span className="text-xs text-gray-500 ml-2">
-                      ({getLevelName(level.level)})
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
-                      <div 
-                                                 className="bg-blue-600 h-2 rounded-full"
-                        style={{ 
-                          width: `${(level._count.level / stats.totalWords) * 100}%` 
-                        }}
-                      ></div>
+                  <div key={level.level} className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium text-gray-700">
+                        Level {level.level}
+                      </span>
+                      <span className="text-xs text-gray-500 ml-2">
+                        ({getLevelName(level.level)})
+                      </span>
                     </div>
-                    <span className="text-sm font-medium text-gray-900">
-                      {level._count.level}
-                    </span>
+                    <div className="flex items-center">
+                      <div className="w-32 bg-gray-200 rounded-full h-2 mr-3">
+                        <div 
+                          className="bg-blue-600 h-2 rounded-full"
+                          style={{ 
+                            width: `${stats.totalWords > 0 ? (level._count.level / stats.totalWords) * 100 : 0}%` 
+                          }}
+                        ></div>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">
+                        {level._count.level}
+                      </span>
+                    </div>
                   </div>
-                </div>
                 ))
               )}
             </div>
@@ -121,28 +160,28 @@ export default async function StatsPage() {
                 <p className="text-gray-500 text-center">Chưa có dữ liệu ôn tập</p>
               ) : (
                 stats.recentReviews.map((review) => (
-                <div key={review.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center">
-                    <div className="text-lg font-bold text-gray-900 mr-3">
-                      {review.vocabulary.chinese}
+                  <div key={review.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center">
+                      <div className="text-lg font-bold text-gray-900 mr-3">
+                        {review.vocabulary.chinese}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        {review.vocabulary.pinyin}
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600">
-                      {review.vocabulary.pinyin}
+                    <div className="flex items-center space-x-2">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        review.result 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {review.result ? 'Đúng' : 'Sai'}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {format(new Date(review.reviewDate), 'dd/MM HH:mm')}
+                      </span>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      review.result 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {review.result ? 'Đúng' : 'Sai'}
-                    </span>
-                                         <span className="text-xs text-gray-500">
-                       {format(review.reviewDate, 'dd/MM HH:mm')}
-                     </span>
-                  </div>
-                </div>
                 ))
               )}
             </div>
@@ -182,4 +221,4 @@ export default async function StatsPage() {
       </main>
     </div>
   )
-} 
+}

@@ -40,8 +40,8 @@ export default function AddVocabularyModal({ isOpen, onClose }: AddVocabularyMod
           example: ''
         })
         onClose()
-        // Refresh the page to update data
-        window.location.reload()
+        // Trigger a custom event to refresh data
+        window.dispatchEvent(new CustomEvent('vocabularyAdded'))
       } else {
         alert('Có lỗi xảy ra khi thêm từ vựng')
       }
