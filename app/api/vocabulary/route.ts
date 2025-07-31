@@ -3,6 +3,11 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET() {
   try {
+    // Check if prisma is available
+    if (!prisma) {
+      return NextResponse.json([])
+    }
+
     const vocabulary = await prisma.vocabulary.findMany({
       where: { isActive: true },
       orderBy: { createdAt: 'desc' }
@@ -11,15 +16,20 @@ export async function GET() {
     return NextResponse.json(vocabulary)
   } catch (error) {
     console.error('Error fetching vocabulary:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    return NextResponse.json([])
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if prisma is available
+    if (!prisma) {
+      return NextResponse.json(
+        { success: false, error: 'Database not available' },
+        { status: 500 }
+      )
+    }
+
     const body = await request.json()
     const { chinese, pinyin, vietnamese, notes, example } = body
 
@@ -61,7 +71,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating vocabulary:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }

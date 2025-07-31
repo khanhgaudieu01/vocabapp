@@ -4,6 +4,11 @@ import { calculateNextReviewDate } from '@/lib/utils'
 
 export async function GET() {
   try {
+    // Check if prisma is available
+    if (!prisma) {
+      return NextResponse.json([])
+    }
+
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     
@@ -24,15 +29,18 @@ export async function GET() {
     return NextResponse.json(reviews)
   } catch (error) {
     console.error('Error fetching reviews:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
+    // Return empty array as fallback
+    return NextResponse.json([])
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if prisma is available
+    if (!prisma) {
+      return NextResponse.json({ success: false, error: 'Database not available' })
+    }
+
     const body = await request.json()
     const { vocabularyId, result, timeSpent } = body
 
@@ -85,7 +93,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error updating review:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { success: false, error: 'Internal server error' },
       { status: 500 }
     )
   }
