@@ -36,16 +36,23 @@ export default function HomePage() {
     fetchStats()
     fetchTodayReviews()
 
-    // Listen for vocabulary added event
+    // Listen for vocabulary added/deleted events
     const handleVocabularyAdded = () => {
       fetchStats()
       fetchTodayReviews()
     }
 
+    const handleVocabularyDeleted = () => {
+      fetchStats()
+      fetchTodayReviews()
+    }
+
     window.addEventListener('vocabularyAdded', handleVocabularyAdded)
+    window.addEventListener('vocabularyDeleted', handleVocabularyDeleted)
 
     return () => {
       window.removeEventListener('vocabularyAdded', handleVocabularyAdded)
+      window.removeEventListener('vocabularyDeleted', handleVocabularyDeleted)
     }
   }, [])
 

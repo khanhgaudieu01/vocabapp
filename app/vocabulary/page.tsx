@@ -54,6 +54,8 @@ export default function VocabularyPage() {
       if (response.ok) {
         // Remove from local state
         setVocabulary(prev => prev.filter(word => word.id !== id))
+        // Dispatch event để trang chủ cập nhật stats
+        window.dispatchEvent(new CustomEvent('vocabularyDeleted'))
       } else {
         alert('Có lỗi xảy ra khi xóa từ vựng')
       }
@@ -61,6 +63,11 @@ export default function VocabularyPage() {
       console.error('Error deleting vocabulary:', error)
       alert('Có lỗi xảy ra khi xóa từ vựng')
     }
+  }
+
+  const handleEdit = (word: Vocabulary) => {
+    // TODO: Implement edit functionality
+    alert(`Chức năng chỉnh sửa cho từ "${word.chinese}" sẽ được phát triển trong phiên bản tiếp theo.`)
   }
 
   return (
@@ -101,7 +108,10 @@ export default function VocabularyPage() {
                     {word.chinese}
                   </div>
                   <div className="flex space-x-2">
-                    <button className="text-gray-400 hover:text-blue-600">
+                    <button 
+                      onClick={() => handleEdit(word)}
+                      className="text-gray-400 hover:text-blue-600"
+                    >
                       <Edit className="h-4 w-4" />
                     </button>
                     <button 
