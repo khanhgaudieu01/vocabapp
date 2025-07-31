@@ -1,0 +1,56 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_URL")
+}
+
+model Vocabulary {
+  id             Int            @id @default(autoincrement())
+  chinese        String         @unique
+  pinyin         String
+  vietnamese     String
+  notes          String?
+  example        String?
+  nextReviewDate DateTime       @default(now())
+  level          Int            @default(1)
+  reviewCount    Int            @default(0)
+  isActive       Boolean        @default(true)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  reviewHistory ReviewHistory[]
+  studyStats    StudyStats[]
+
+  @@map("vocabulary")
+}
+
+model ReviewHistory {
+  id            Int        @id @default(autoincrement())
+  vocabularyId  Int
+  reviewDate    DateTime   @default(now())
+  result        Boolean
+  timeSpent     Int        // seconds
+  createdAt     DateTime   @default(now())
+
+  vocabulary    Vocabulary @relation(fields: [vocabularyId], references: [id], onDelete: Cascade)
+
+  @@map("review_history")
+}
+
+model StudyStats {
+  id             Int        @id @default(autoincrement())
+  date           DateTime   @unique @default(now())
+  totalReviews   Int        @default(0)
+  correctReviews Int        @default(0)
+  newWordsAdded  Int        @default(0)
+  studyTime      Int        @default(0) // minutes
+  createdAt      DateTime   @default(now())
+
+  @@map("study_stats")
+} 
