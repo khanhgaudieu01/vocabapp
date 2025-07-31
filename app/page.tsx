@@ -5,18 +5,70 @@ import Link from 'next/link'
 import { BookOpen, Clock, CheckCircle, TrendingUp } from 'lucide-react'
 
 async function getStats() {
-  // Temporary mock data for build success
-  return {
-    totalWords: 0,
-    todayReviews: 0,
-    totalReviews: 0,
-    successRate: 0
+  try {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    const [totalWords, todayReviews, totalReviews, correctReviews] = await Promise.all([
+      prisma.vocabulary.count({ where: { isActive: true } }),
+      prisma.vocabulary.count({
+        where: {
+          isActive: true,
+          nextReviewDate: {
+            gte: today,
+            lt: tomorrow
+          }
+        }
+      }),
+      prisma.reviewHistory.count(),
+      prisma.reviewHistory.count({ where: { result: true } })
+    ])
+
+    const successRate = totalReviews > 0 ? Math.round((correctReviews / totalReviews) * 100) : 0
+
+    return {
+      totalWords,
+      todayReviews,
+      totalReviews,
+      successRate
+    }
+  } catch (error) {
+    console.error('Error getting stats:', error)
+    return {
+      totalWords: 0,
+      todayReviews: 0,
+      totalReviews: 0,
+      successRate: 0
+    }
   }
 }
 
 async function getTodayReviews(): Promise<any[]> {
-  // Temporary mock data for build success
-  return []
+  try {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    return await prisma.vocabulary.findMany({
+      where: {
+        isActive: true,
+        nextReviewDate: {
+          gte: today,
+          lt: tomorrow
+        }
+      },
+      orderBy: { nextReviewDate: 'asc' },
+      take: 10
+    })
+  } catch (error) {
+    console.error('Error getting today reviews:', error)
+    return []
+  }
 }
 
 export default async function HomePage() {
