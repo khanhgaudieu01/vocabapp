@@ -67,7 +67,8 @@ export default function ReviewPage() {
       })
 
       if (response.ok) {
-        setCompletedCount(prev => prev + 1)
+        const newCompletedCount = completedCount + 1
+        setCompletedCount(newCompletedCount)
         
         if (currentIndex < vocabulary.length - 1) {
           setCurrentIndex(prev => prev + 1)
@@ -75,6 +76,8 @@ export default function ReviewPage() {
         } else {
           // Completed all reviews
           alert('Chúc mừng! Bạn đã hoàn thành tất cả từ cần ôn tập hôm nay.')
+          // Redirect to home page after completion
+          window.location.href = '/'
         }
       }
     } catch (error) {
@@ -145,16 +148,16 @@ export default function ReviewPage() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
             <span className="text-sm text-gray-600">
-              Tiến độ: {completedCount + 1} / {vocabulary.length}
+              Tiến độ: {Math.min(currentIndex + 1, vocabulary.length)} / {vocabulary.length}
             </span>
             <span className="text-sm text-gray-600">
-              {Math.round(((completedCount + 1) / vocabulary.length) * 100)}%
+              {Math.round((Math.min(currentIndex + 1, vocabulary.length) / vocabulary.length) * 100)}%
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div 
               className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${((completedCount + 1) / vocabulary.length) * 100}%` }}
+              style={{ width: `${(Math.min(currentIndex + 1, vocabulary.length) / vocabulary.length) * 100}%` }}
             ></div>
           </div>
         </div>

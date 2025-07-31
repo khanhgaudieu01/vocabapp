@@ -1,16 +1,45 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
-import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
 import { getLevelName } from '@/lib/utils'
 import { Trash2, Edit } from 'lucide-react'
 
-async function getVocabulary(): Promise<any[]> {
-  // Temporary mock data for build success
-  return []
+interface Vocabulary {
+  id: number
+  chinese: string
+  pinyin: string
+  vietnamese: string
+  notes?: string
+  example?: string
+  level: number
+  reviewCount: number
+  nextReviewDate: string
+  createdAt: string
 }
 
-export default async function VocabularyPage() {
-  const vocabulary = await getVocabulary()
+export default function VocabularyPage() {
+  const [vocabulary, setVocabulary] = useState<Vocabulary[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    fetchVocabulary()
+  }, [])
+
+  const fetchVocabulary = async () => {
+    try {
+      const response = await fetch('/api/vocabulary')
+      if (response.ok) {
+        const data = await response.json()
+        setVocabulary(data)
+      }
+    } catch (error) {
+      console.error('Error fetching vocabulary:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div>
@@ -26,7 +55,12 @@ export default async function VocabularyPage() {
           </p>
         </div>
 
-        {vocabulary.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Đang tải từ vựng...</p>
+          </div>
+        ) : vocabulary.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">📚</div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -80,10 +114,10 @@ export default async function VocabularyPage() {
 
                 <div className="mt-3 pt-3 border-t border-gray-100">
                   <div className="text-xs text-gray-500">
-                    <strong>Ôn tập tiếp:</strong> {format(word.nextReviewDate, 'dd/MM/yyyy')}
+                    <strong>Ôn tập tiếp:</strong> {format(new Date(word.nextReviewDate), 'dd/MM/yyyy')}
                   </div>
                   <div className="text-xs text-gray-500">
-                    <strong>Thêm ngày:</strong> {format(word.createdAt, 'dd/MM/yyyy')}
+                    <strong>Thêm ngày:</strong> {format(new Date(word.createdAt), 'dd/MM/yyyy')}
                   </div>
                 </div>
               </div>

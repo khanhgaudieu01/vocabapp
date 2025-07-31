@@ -1,81 +1,67 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Header from '@/components/Header'
-import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { BookOpen, Clock, CheckCircle, TrendingUp } from 'lucide-react'
 
-async function getStats() {
-  try {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
-    const [totalWords, todayReviews, totalReviews, correctReviews] = await Promise.all([
-      prisma.vocabulary.count({ where: { isActive: true } }),
-      prisma.vocabulary.count({
-        where: {
-          isActive: true,
-          nextReviewDate: {
-            gte: today,
-            lt: tomorrow
-          }
-        }
-      }),
-      prisma.reviewHistory.count(),
-      prisma.reviewHistory.count({ where: { result: true } })
-    ])
-
-    const successRate = totalReviews > 0 ? Math.round((correctReviews / totalReviews) * 100) : 0
-
-    return {
-      totalWords,
-      todayReviews,
-      totalReviews,
-      successRate
-    }
-  } catch (error) {
-    console.error('Error getting stats:', error)
-    return {
-      totalWords: 0,
-      todayReviews: 0,
-      totalReviews: 0,
-      successRate: 0
-    }
-  }
+interface Stats {
+  totalWords: number
+  todayReviews: number
+  totalReviews: number
+  successRate: number
 }
 
-async function getTodayReviews(): Promise<any[]> {
-  try {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    
-    const tomorrow = new Date(today)
-    tomorrow.setDate(tomorrow.getDate() + 1)
-
-    return await prisma.vocabulary.findMany({
-      where: {
-        isActive: true,
-        nextReviewDate: {
-          gte: today,
-          lt: tomorrow
-        }
-      },
-      orderBy: { nextReviewDate: 'asc' },
-      take: 10
-    })
-  } catch (error) {
-    console.error('Error getting today reviews:', error)
-    return []
-  }
+interface Vocabulary {
+  id: number
+  chinese: string
+  pinyin: string
+  vietnamese: string
+  level: number
+  reviewCount: number
 }
 
-export default async function HomePage() {
-  const [stats, todayReviews] = await Promise.all([
-    getStats(),
-    getTodayReviews()
-  ])
+export default function HomePage() {
+  const [stats, setStats] = useState<Stats>({
+    totalWords: 0,
+    todayReviews: 0,
+    totalReviews: 0,
+    successRate: 0
+  })
+  const [todayReviews, setTodayReviews] = useState<Vocabulary[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    fetchStats()
+    fetchTodayReviews()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch('/api/stats')
+      if (response.ok) {
+        const data = await response.json()
+        setStats(data)
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    }
+  }
+
+  const fetchTodayReviews = async () => {
+    try {
+      const response = await fetch('/api/review')
+      if (response.ok) {
+        const data = await response.json()
+        setTodayReviews(data.slice(0, 10))
+      }
+    } catch (error) {
+      console.error('Error fetching today reviews:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
     <div>
