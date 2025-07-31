@@ -22,8 +22,21 @@ export async function GET() {
       recentReviews
     ] = await Promise.all([
       prisma.vocabulary.count({ where: { isActive: true } }),
-      prisma.reviewHistory.count(),
-      prisma.reviewHistory.count({ where: { result: true } }),
+      prisma.reviewHistory.count({
+        where: {
+          vocabulary: {
+            isActive: true
+          }
+        }
+      }),
+      prisma.reviewHistory.count({
+        where: {
+          result: true,
+          vocabulary: {
+            isActive: true
+          }
+        }
+      }),
       prisma.vocabulary.groupBy({
         by: ['level'],
         where: { isActive: true },
@@ -32,6 +45,11 @@ export async function GET() {
       prisma.reviewHistory.findMany({
         take: 10,
         orderBy: { reviewDate: 'desc' },
+        where: {
+          vocabulary: {
+            isActive: true
+          }
+        },
         include: {
           vocabulary: true
         }

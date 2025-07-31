@@ -29,8 +29,21 @@ export async function GET() {
           }
         }
       }),
-      prisma.reviewHistory.count(),
-      prisma.reviewHistory.count({ where: { result: true } })
+      prisma.reviewHistory.count({
+        where: {
+          vocabulary: {
+            isActive: true
+          }
+        }
+      }),
+      prisma.reviewHistory.count({
+        where: {
+          result: true,
+          vocabulary: {
+            isActive: true
+          }
+        }
+      })
     ])
 
     const successRate = totalReviews > 0 ? Math.round((correctReviews / totalReviews) * 100) : 0
