@@ -1,7 +1,6 @@
 import Header from '@/components/Header'
 import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
 import { getLevelName } from '@/lib/utils'
 import { BarChart3, TrendingUp, Clock, CheckCircle } from 'lucide-react'
 
@@ -157,9 +156,9 @@ export default async function StatsPage() {
                     }`}>
                       {review.result ? 'Đúng' : 'Sai'}
                     </span>
-                    <span className="text-xs text-gray-500">
-                      {format(review.reviewDate, 'dd/MM HH:mm', { locale: vi })}
-                    </span>
+                                         <span className="text-xs text-gray-500">
+                       {format(review.reviewDate, 'dd/MM HH:mm')}
+                     </span>
                   </div>
                 </div>
               ))}

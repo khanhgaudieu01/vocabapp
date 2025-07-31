@@ -1,7 +1,6 @@
 import Header from '@/components/Header'
 import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
 import Link from 'next/link'
 import { BookOpen, Clock, CheckCircle, TrendingUp } from 'lucide-react'
 
@@ -125,7 +124,7 @@ export default async function HomePage() {
         <div className="card">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
-              Từ cần ôn tập hôm nay ({format(new Date(), 'EEEE, dd/MM/yyyy', { locale: vi })})
+              Từ cần ôn tập hôm nay ({format(new Date(), 'dd/MM/yyyy')})
             </h2>
             {stats.todayReviews > 0 && (
               <Link 

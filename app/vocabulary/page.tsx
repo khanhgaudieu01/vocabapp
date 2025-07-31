@@ -1,7 +1,6 @@
 import Header from '@/components/Header'
 import { prisma } from '@/lib/prisma'
 import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
 import { getLevelName } from '@/lib/utils'
 import { Trash2, Edit } from 'lucide-react'
 
@@ -83,10 +82,10 @@ export default async function VocabularyPage() {
 
                 <div className="mt-3 pt-3 border-t border-gray-100">
                   <div className="text-xs text-gray-500">
-                    <strong>Ôn tập tiếp:</strong> {format(word.nextReviewDate, 'dd/MM/yyyy', { locale: vi })}
+                    <strong>Ôn tập tiếp:</strong> {format(word.nextReviewDate, 'dd/MM/yyyy')}
                   </div>
                   <div className="text-xs text-gray-500">
-                    <strong>Thêm ngày:</strong> {format(word.createdAt, 'dd/MM/yyyy', { locale: vi })}
+                    <strong>Thêm ngày:</strong> {format(word.createdAt, 'dd/MM/yyyy')}
                   </div>
                 </div>
               </div>
