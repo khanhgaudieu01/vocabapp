@@ -25,7 +25,6 @@ model Vocabulary {
   updatedAt      DateTime       @updatedAt
 
   reviewHistory ReviewHistory[]
-  studyStats    StudyStats[]
 
   @@map("vocabulary")
 }
