@@ -41,9 +41,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if word already exists
-    const existingWord = await prisma.vocabulary.findUnique({
-      where: { chinese }
+    // Check if word already exists (only active words)
+    const existingWord = await prisma.vocabulary.findFirst({
+      where: { 
+        chinese,
+        isActive: true 
+      }
     })
 
     if (existingWord) {
