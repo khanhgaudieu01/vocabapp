@@ -28,6 +28,29 @@ export default function StatsPage() {
 
   useEffect(() => {
     fetchStats()
+
+    // Listen for vocabulary added/deleted events
+    const handleVocabularyAdded = () => {
+      console.log('vocabularyAdded event received in stats page')
+      setTimeout(() => {
+        fetchStats()
+      }, 500)
+    }
+
+    const handleVocabularyDeleted = () => {
+      console.log('vocabularyDeleted event received in stats page')
+      setTimeout(() => {
+        fetchStats()
+      }, 500)
+    }
+
+    window.addEventListener('vocabularyAdded', handleVocabularyAdded)
+    window.addEventListener('vocabularyDeleted', handleVocabularyDeleted)
+
+    return () => {
+      window.removeEventListener('vocabularyAdded', handleVocabularyAdded)
+      window.removeEventListener('vocabularyDeleted', handleVocabularyDeleted)
+    }
   }, [])
 
   const fetchStats = async () => {

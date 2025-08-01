@@ -38,13 +38,19 @@ export default function HomePage() {
 
     // Listen for vocabulary added/deleted events
     const handleVocabularyAdded = () => {
-      fetchStats()
-      fetchTodayReviews()
+      console.log('vocabularyAdded event received')
+      setTimeout(() => {
+        fetchStats()
+        fetchTodayReviews()
+      }, 500) // Wait 500ms for server to process
     }
 
     const handleVocabularyDeleted = () => {
-      fetchStats()
-      fetchTodayReviews()
+      console.log('vocabularyDeleted event received')
+      setTimeout(() => {
+        fetchStats()
+        fetchTodayReviews()
+      }, 500) // Wait 500ms for server to process
     }
 
     window.addEventListener('vocabularyAdded', handleVocabularyAdded)

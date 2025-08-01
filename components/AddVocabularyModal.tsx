@@ -43,7 +43,9 @@ export default function AddVocabularyModal({ isOpen, onClose }: AddVocabularyMod
         // Trigger a custom event to refresh data
         window.dispatchEvent(new CustomEvent('vocabularyAdded'))
       } else {
-        alert('Có lỗi xảy ra khi thêm từ vựng')
+        // Get error message from server
+        const errorData = await response.json()
+        alert(errorData.error || 'Có lỗi xảy ra khi thêm từ vựng')
       }
     } catch (error) {
       console.error('Error adding vocabulary:', error)
